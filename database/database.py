@@ -5,42 +5,84 @@ This is the database creation script.
 from sqlalchemy import Column, DateTime, String, Integer, Float, ForeignKey, func
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
+import datetime
 
 Base = declarative_base()
 
 class Quest(Base):
     __tablename__='Quest'
     id= Column(Integer, primary_key=True)
-    name = Column(String(20))
-    latitude = Column(Float)
-    longitude = Column(Float)
+    name = Column(String(20), nullable=False)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
     post_time = Column(DateTime, default=func.now())
-    expiration_date = Column(DateTime)
-    challenge_id = Column(Integer, ForeignKey(Challenge.id))
+    expiration_date = Column(DateTime, nullable=False)
+    objective_id = Column(Integer, ForeignKey('Objective.id'), nullable=False)
+    challenge_id = Column(Integer, ForeignKey('Challenge.id'), nullable=False)
 
-class ChallengeObjectives(Base):
-    __tablename__='QuestObjectives'
+class Objective(Base):
+    __tablename__='Objective'
     id= Column(Integer, primary_key=True)
-    objective_text = Column(String(200))
+    objective_text = Column(String(200), nullable=False)
 
+'''
 class QuestChallengeObjectives(Base):
     __tablename__='QuestChallengeObjectives'
     id= Column(Integer, primary_key=True)
         quest_id = Column(Integer, ForeignKey(Quest.id))
         challenge_objective_id = Column(Integer,
             ForeignKey(ChallengeObjectives.id))
+'''
 
 class Challenge(Base):
     __tablename__='Challenge'
     id= Column(Integer, primary_key=True)
-    challenge_text = Column(String(200))
+    challenge_text = Column(String(200), nullable=False)
 
 class QuestSubmission(Base):
     __tablename__='QuestSubmission'
     id= Column(Integer, primary_key=True)
-    image_path = String(300)
-    quest_id =  Column(Integer, ForeignKey(Quest.id))
-    user_id = Column(String(200))
+    image_path = Column(String(300))
+    text_response = Column(String(300), nullable=False)
+    quest_id =  Column(Integer, ForeignKey('Quest.id'), nullable=False)
+    user_id = Column(String(200), nullable=False)
+
+
+def insert_seed_data(Session):
+    session = Session()
+    challenges = [
+        Challenge(challenge_text="Find the statue in Gore Park!"),
+        Challenge(challenge_text="Capture a Pokemon at McMaster")
+    ]
+
+    objectives = [
+        Objective(objective_text="Take a picture of it!"),
+        Objective(objective_text="Do it with gusto!")
+    ]
+
+    quests = [
+        Quest(name="State1", latitude=1.0,
+            longitude=2.0,
+            expiration_date=datetime.datetime(2017, 5, 5),
+            challenge_id=1,
+            objective_id=1),
+        Quest(name="State2", latitude=4.0,
+            longitude=3.0,
+            expiration_date=datetime.datetime(2017, 5, 5),
+            challenge_id=2,
+            objective_id=2)
+    ]
+
+    for objective in objectives:
+        session.add(objective)
+
+    for challenge in challenges:
+        session.add(challenge)
+    session.commit()
+
+    for quest in quests:
+        session.add(quest)
+    session.commit()
 
 if __name__=="__main__":
     import ConfigParser
@@ -64,3 +106,4 @@ if __name__=="__main__":
     session = sessionmaker()
     session.configure(bind=engine)
     Base.metadata.create_all(engine)
+    insert_seed_data(session)
