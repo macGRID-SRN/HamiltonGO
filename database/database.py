@@ -2,7 +2,7 @@
 This is the database creation script.
 '''
 
-from sqlalchemy import Column, DateTime, String, Integer, Float, ForeignKey, func
+from sqlalchemy import Column, DateTime, Boolean, String, Integer, Float, ForeignKey, func
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 import datetime
@@ -15,24 +15,15 @@ class Quest(Base):
     name = Column(String(20), nullable=False)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
-    post_time = Column(DateTime, default=func.now())
     expiration_date = Column(DateTime, nullable=False)
     objective_id = Column(Integer, ForeignKey('Objective.id'), nullable=False)
     challenge_id = Column(Integer, ForeignKey('Challenge.id'), nullable=False)
+    post_time = Column(DateTime, default=func.now())
 
 class Objective(Base):
     __tablename__='Objective'
     id= Column(Integer, primary_key=True)
     objective_text = Column(String(200), nullable=False)
-
-'''
-class QuestChallengeObjectives(Base):
-    __tablename__='QuestChallengeObjectives'
-    id= Column(Integer, primary_key=True)
-        quest_id = Column(Integer, ForeignKey(Quest.id))
-        challenge_objective_id = Column(Integer,
-            ForeignKey(ChallengeObjectives.id))
-'''
 
 class Challenge(Base):
     __tablename__='Challenge'
@@ -42,11 +33,19 @@ class Challenge(Base):
 class QuestSubmission(Base):
     __tablename__='QuestSubmission'
     id= Column(Integer, primary_key=True)
-    image_path = Column(String(300))
+    imgur_uri = Column(String(300), nullable=False)
     text_response = Column(String(300), nullable=False)
     quest_id =  Column(Integer, ForeignKey('Quest.id'), nullable=False)
-    user_id = Column(String(200), nullable=False)
+    user_id = Column(Integer, ForeignKey('User.id'), nullable=False)
+    completion_time = Column(DateTime, default=func.now())
 
+class User(Base):
+    __tablename__='User'
+    id= Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False)
+    user_name = Column(String(50), nullable=False)
+    unique_identifier = Column(String(300), nullable=False, unique=True)
+    join_time = Column(DateTime, default=func.now())
 
 def insert_seed_data(Session):
     session = Session()

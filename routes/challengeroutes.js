@@ -6,7 +6,8 @@ module.exports = {
       challenge.get(res);
     });
 
-    app.post("/challenge/", function(req, res) {
+    app.post("/challenge/",
+      function(req, res) {
       challenge.create(req.body, res);
     });
   }

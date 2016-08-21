@@ -8,11 +8,11 @@ function Connection() {
   this.init = function() {
       this.pool = mysql.createPool({
         connectionLimit: 10,
-        host: config.host,
-        user: config.user,
-        password: config.password,
-        database: config.database,
-        socketPath : config.socket
+        host: config.database.host,
+        user: config.database.user,
+        password: config.database.password,
+        database: config.database.database,
+        socketPath : config.database.socket
       });
   };
 

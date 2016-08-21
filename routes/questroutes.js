@@ -6,8 +6,9 @@ module.exports = {
       quest.get(res);
     });
 
-    app.post("/quest/", function(req, res) {
-      quest.create(req.body, res);
+    app.post("/quest/",
+      function(req, res) {
+        quest.create(req.body, res);
     });
   }
 };

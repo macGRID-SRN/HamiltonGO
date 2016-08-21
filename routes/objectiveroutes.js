@@ -6,8 +6,9 @@ module.exports = {
       objective.get(res);
     });
 
-    app.post("/objective/", function(req, res) {
-      objective.create(req.body, res);
+    app.post("/objective/",
+      function(req, res) {
+        objective.create(req.body, res);
     });
   }
 };
